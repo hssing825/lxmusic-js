@@ -5,3 +5,4 @@ export { registerSourceHandlers } from './source';
 export { registerSonglistHandlers } from './songlist';
 export { registerLeaderboardHandlers } from './leaderboard';
 export { registerSettingsHandlers } from './settings';
+export { registerDownloadHandlers } from './download';

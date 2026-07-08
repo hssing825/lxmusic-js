@@ -96,7 +96,7 @@ function buildLyricURL(registry: Registry, song: ImportSongItem): string {
   const qs = Object.keys(params)
     .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
     .join('&');
-  return `/api/v1/jsplugin/lxmusic/api/direct/lyric?${qs}`;
+  return `/api/v1/jsplugin/mylxmusic/api/direct/lyric?${qs}`;
 }
 
 /** 构建歌词响应（带永久缓存头） */
@@ -385,7 +385,7 @@ export function registerSearchHandlers(
           album: item.song.album || '',
           cover_url: item.song.img || '',
           duration: item.song.duration || 0,
-          plugin_entry_path: 'lxmusic',
+          plugin_entry_path: 'mylxmusic',
           source_data: JSON.stringify(item.sourceData),
           dedup_key: buildDedupKey(item.song),
           lyric_source: lyricURL ? 'url' : '',
@@ -562,7 +562,7 @@ export function registerSearchHandlers(
               music_source: platform,
               lyric: lyricURL,
               lyric_source: lyricURL ? 'url' : '',
-              plugin_entry_path: 'lxmusic',
+              plugin_entry_path: 'mylxmusic',
               dedup_key: dedupKey,
               source_data: sr.source_data as Record<string, unknown>,
             });

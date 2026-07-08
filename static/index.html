@@ -456,6 +456,11 @@
             <div id="playerProgressBarFill" class="player-progress-bar-fill"></div>
         </div>
         <div class="player-body">
+            <div class="player-left-actions">
+                <button id="playerDownloadBtn" class="player-btn player-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
+                    <span class="material-symbols-outlined">download_for_offline</span>
+                </button>
+            </div>
             <img id="playerCover" class="player-cover" src="" alt="" onclick="toggleFullPlayer()">
             <div class="player-info" onclick="toggleFullPlayer()">
                 <div class="player-name-row">
@@ -507,9 +512,14 @@
     <!-- 全屏播放器 -->
     <div id="fullPlayer" class="full-player" style="display:none" onclick="onFullPlayerBackdropClick(event)">
         <div class="fp-container">
-            <button class="fp-close-btn" onclick="toggleFullPlayer()" title="收起">
-                <span class="material-symbols-outlined">keyboard_arrow_down</span>
-            </button>
+            <div class="fp-top-actions">
+                <button id="fpDownloadBtn" class="fp-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
+                    <span class="material-symbols-outlined">download_for_offline</span>
+                </button>
+                <button class="fp-close-btn" onclick="toggleFullPlayer()" title="收起">
+                    <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                </button>
+            </div>
             <div class="fp-label">NOW PLAYING</div>
             <div class="fp-layout">
                 <div class="fp-left">

@@ -1422,6 +1422,35 @@ select option {
     gap: 12px;
 }
 
+/* Left: download button actions */
+.player-left-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 2px;
+}
+
+.player-left-actions .player-btn-icon {
+    width: 34px;
+    height: 34px;
+    color: var(--md-on-surface-variant);
+    transition: color .2s, background .2s;
+}
+
+.player-left-actions .player-btn-icon:hover {
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+}
+
+.player-left-actions .player-btn-icon.downloading {
+    color: var(--md-primary);
+    pointer-events: none;
+}
+
+.player-left-actions .player-btn-icon.download-done {
+    color: var(--md-success);
+}
+
 /* Left: cover + info */
 .player-cover {
     width: 48px; height: 48px;
@@ -1573,8 +1602,27 @@ select option {
     min-height: 0; overflow: hidden;
 }
 
-.fp-close-btn {
+.fp-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     position: absolute; top: 12px; left: 16px;
+    z-index: 10;
+}
+
+.fp-btn-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; background: transparent;
+    color: var(--md-on-surface-variant); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+}
+.fp-btn-icon:hover { background: var(--md-primary-container); color: var(--md-primary); }
+.fp-btn-icon .material-symbols-outlined { font-size: 24px; }
+.fp-btn-icon.downloading { color: var(--md-primary); pointer-events: none; }
+.fp-btn-icon.download-done { color: var(--md-success); }
+
+.fp-close-btn {
     width: 40px; height: 40px; border-radius: 50%;
     border: none; background: transparent;
     color: var(--md-on-surface-variant); cursor: pointer;

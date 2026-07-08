@@ -1,5 +1,5 @@
 // API 基础路径
-const API_BASE = '/api/v1/jsplugin/lxmusic/api';
+const API_BASE = '/api/v1/jsplugin/mylxmusic/api';
 const MAIN_API = '/api/v1';
 
 // 状态
@@ -3437,9 +3437,99 @@ window.seekPlayerProgress = seekPlayerProgress;
 window.onVolumeChange = onVolumeChange;
 window.onHotSearchItemClick = onHotSearchItemClick;
 window.backToHotSearch = backToHotSearch;
+// ============ 歌曲下载 ============
+
+let isDownloading = false;
+
+async function downloadCurrentSong() {
+    if (isDownloading) { showSnackbar('正在下载中，请稍候...', 'warning'); return; }
+
+    const song = getActiveSong();
+    if (!song) { showSnackbar('没有正在播放的歌曲', 'warning'); return; }
+
+    const name = song.name || '';
+    const singer = song.singer || '';
+    const album = song.album || '';
+    const source = song.source || '';
+    const quality = getBestQuality(song);
+
+    const downloadBtn = document.getElementById('playerDownloadBtn');
+    const fpDownloadBtn = document.getElementById('fpDownloadBtn');
+
+    const setDownloadingState = (dl) => {
+        isDownloading = dl;
+        if (downloadBtn) {
+            downloadBtn.classList.toggle('downloading', dl);
+            const span = downloadBtn.querySelector('.material-symbols-outlined');
+            if (span) span.textContent = dl ? 'downloading' : 'download_for_offline';
+        }
+        if (fpDownloadBtn) {
+            fpDownloadBtn.classList.toggle('downloading', dl);
+            const span = fpDownloadBtn.querySelector('.material-symbols-outlined');
+            if (span) span.textContent = dl ? 'downloading' : 'download_for_offline';
+        }
+    };
+
+    const setDoneState = () => {
+        if (downloadBtn) {
+            downloadBtn.classList.remove('downloading');
+            downloadBtn.classList.add('download-done');
+            const span = downloadBtn.querySelector('.material-symbols-outlined');
+            if (span) span.textContent = 'download_done';
+            setTimeout(() => {
+                downloadBtn.classList.remove('download-done');
+                if (span) span.textContent = 'download_for_offline';
+            }, 2500);
+        }
+        if (fpDownloadBtn) {
+            fpDownloadBtn.classList.remove('downloading');
+            fpDownloadBtn.classList.add('download-done');
+            const span = fpDownloadBtn.querySelector('.material-symbols-outlined');
+            if (span) span.textContent = 'download_done';
+            setTimeout(() => {
+                fpDownloadBtn.classList.remove('download-done');
+                if (span) span.textContent = 'download_for_offline';
+            }, 2500);
+        }
+    };
+
+    setDownloadingState(true);
+    showSnackbar('正在下载: ' + name + '...', 'info');
+
+    try {
+        const body = {
+            name, singer, album, source, quality,
+            musicId: song.musicId || song.songmid || '',
+            songmid: song.songmid || song.musicId || '',
+            hash: song.hash || '',
+            duration: song.duration || 0,
+            img: song.img || '',
+        };
+        if (song.albumId) body.albumId = song.albumId;
+        if (song.strMediaMid) body.strMediaMid = song.strMediaMid;
+        if (song.albumMid) body.albumMid = song.albumMid;
+        if (song.copyrightId) body.copyrightId = song.copyrightId;
+
+        const resp = await apiPost('/direct/download', body);
+
+        if (resp.code === 0) {
+            setDoneState();
+            showSnackbar('下载成功: ' + name + ' (已嵌入元数据)', 'success');
+        } else {
+            setDownloadingState(false);
+            showSnackbar('下载失败: ' + (resp.message || '未知错误'), 'error');
+        }
+    } catch (e) {
+        setDownloadingState(false);
+        console.error('下载歌曲失败:', e);
+        showSnackbar('下载失败: ' + (e.message || '网络错误'), 'error');
+    }
+}
+
 // Player v2.5.0 new functions
 window.toggleRepeatMode = toggleRepeatMode;
 window.cycleSpeed = cycleSpeed;
 window.toggleFullPlayer = toggleFullPlayer;
 window.onFullPlayerBackdropClick = onFullPlayerBackdropClick;
 window.seekToLyricLine = seekToLyricLine;
+window.downloadCurrentSong = downloadCurrentSong;
