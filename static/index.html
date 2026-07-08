@@ -456,11 +456,6 @@
             <div id="playerProgressBarFill" class="player-progress-bar-fill"></div>
         </div>
         <div class="player-body">
-            <div class="player-left-actions">
-                <button id="playerDownloadBtn" class="player-btn player-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
-                    <span class="material-symbols-outlined">download_for_offline</span>
-                </button>
-            </div>
             <img id="playerCover" class="player-cover" src="" alt="" onclick="toggleFullPlayer()">
             <div class="player-info" onclick="toggleFullPlayer()">
                 <div class="player-name-row">
@@ -476,6 +471,9 @@
                     <span class="player-time player-time-total" id="playerTimeTotal">0:00</span>
                 </div>
                 <div class="player-controls-enhanced">
+                    <button id="playerDownloadBtn" class="player-btn player-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
+                        <span class="material-symbols-outlined">download_for_offline</span>
+                    </button>
                     <button id="playerRepeatBtn" class="player-btn player-btn-icon" onclick="toggleRepeatMode()" title="循环模式">
                         <span class="material-symbols-outlined">repeat</span>
                     </button>
@@ -513,9 +511,6 @@
     <div id="fullPlayer" class="full-player" style="display:none" onclick="onFullPlayerBackdropClick(event)">
         <div class="fp-container">
             <div class="fp-top-actions">
-                <button id="fpDownloadBtn" class="fp-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
-                    <span class="material-symbols-outlined">download_for_offline</span>
-                </button>
                 <button class="fp-close-btn" onclick="toggleFullPlayer()" title="收起">
                     <span class="material-symbols-outlined">keyboard_arrow_down</span>
                 </button>
@@ -545,6 +540,9 @@
                     <span class="player-time" id="fpTimeTotal">0:00</span>
                 </div>
                 <div class="fp-controls">
+                    <button id="fpDownloadBtn" class="player-btn player-btn-icon" onclick="downloadCurrentSong()" title="下载歌曲">
+                        <span class="material-symbols-outlined">download_for_offline</span>
+                    </button>
                     <button id="fpRepeatBtn" class="player-btn player-btn-icon" onclick="toggleRepeatMode()" title="循环模式">
                         <span class="material-symbols-outlined">repeat</span>
                     </button>

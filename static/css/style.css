@@ -1422,32 +1422,15 @@ select option {
     gap: 12px;
 }
 
-/* Left: download button actions */
-.player-left-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-right: 2px;
-}
-
-.player-left-actions .player-btn-icon {
-    width: 34px;
-    height: 34px;
-    color: var(--md-on-surface-variant);
-    transition: color .2s, background .2s;
-}
-
-.player-left-actions .player-btn-icon:hover {
-    color: var(--md-primary);
-    background: var(--md-primary-container);
-}
-
-.player-left-actions .player-btn-icon.downloading {
+/* Player controls download button */
+.player-controls-enhanced .player-btn-icon.downloading,
+.fp-controls .player-btn-icon.downloading {
     color: var(--md-primary);
     pointer-events: none;
 }
 
-.player-left-actions .player-btn-icon.download-done {
+.player-controls-enhanced .player-btn-icon.download-done,
+.fp-controls .player-btn-icon.download-done {
     color: var(--md-success);
 }
 
