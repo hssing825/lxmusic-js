@@ -602,6 +602,21 @@
         </div>
     </div>
 
+    <div id="qualityPickerOverlay" class="dialog-overlay" onclick="closeQualityPicker(event)">
+        <div class="dialog quality-picker-dialog" onclick="event.stopPropagation()">
+            <div class="dialog-title">选择下载音质</div>
+            <div class="dialog-content" id="qualityPickerContent"></div>
+            <div class="quality-picker-options" id="qualityPickerOptions">
+                <button class="quality-option" data-quality="128k">128k</button>
+                <button class="quality-option" data-quality="320k">320k</button>
+                <button class="quality-option" data-quality="flac">FLAC</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-text" onclick="closeQualityPicker()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <script src="static/js/app.js"></script>
 </body>
 </html>

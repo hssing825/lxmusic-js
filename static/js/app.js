@@ -715,6 +715,9 @@ function renderResults() {
                 <div class="col-album">${escapeHtml(song.album || '')}</div>
                 <div class="col-duration">${formatDuration(song.duration)}</div>
                 <div class="col-actions">
+                    <button class="dl-btn sr-dl-btn" data-index="${i}" title="下载">
+                        <span class="material-symbols-outlined">download_for_offline</span>
+                    </button>
                     <button class="play-btn sr-play-btn" data-index="${i}" title="播放">
                         <span class="material-symbols-outlined">${playIcon}</span>
                     </button>
@@ -732,6 +735,14 @@ function renderResults() {
         btn.addEventListener('click', function() {
             const idx = parseInt(this.getAttribute('data-index'));
             srPlaySong(idx);
+        });
+    });
+
+    // 绑定搜索结果行下载按钮点击事件
+    container.querySelectorAll('.sr-dl-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const idx = parseInt(this.getAttribute('data-index'));
+            showQualityPicker(searchResults[idx]);
         });
     });
 
@@ -2197,6 +2208,9 @@ function slRenderDetailList() {
                 <div class="col-album">${escapeHtml(song.album || '')}</div>
                 <div class="col-duration">${formatDuration(song.duration)}</div>
                 <div class="col-actions">
+                    <button class="dl-btn" onclick="slDownloadSong(${i})" title="下载">
+                        <span class="material-symbols-outlined">download_for_offline</span>
+                    </button>
                     <button class="play-btn" onclick="slPlaySong(${i})" title="播放">
                         <span class="material-symbols-outlined">${playIcon}</span>
                     </button>
@@ -2836,6 +2850,12 @@ function lbUpdatePlayBtn(playing) {
 
 // ============ 播放器功能 ============
 
+function slDownloadSong(index) {
+    const song = slDetailSongs[index];
+    if (!song) return;
+    showQualityPicker(song);
+}
+
 async function slPlaySong(index) {
     const song = slDetailSongs[index];
     if (!song) return;
@@ -3249,6 +3269,9 @@ function lbRenderList() {
                 <div class="col-album">${escapeHtml(song.album || '')}</div>
                 <div class="col-duration">${formatDuration(song.duration)}</div>
                 <div class="col-actions">
+                    <button class="dl-btn lb-dl-btn" data-index="${i}" title="下载">
+                        <span class="material-symbols-outlined">download_for_offline</span>
+                    </button>
                     <button class="play-btn lb-play-btn" data-index="${i}" title="播放">
                         <span class="material-symbols-outlined">${playIcon}</span>
                     </button>
@@ -3262,6 +3285,14 @@ function lbRenderList() {
         btn.addEventListener('click', function() {
             const idx = parseInt(this.getAttribute('data-index'));
             lbPlaySong(idx);
+        });
+    });
+
+    // 绑定排行榜行下载按钮点击事件
+    container.querySelectorAll('.lb-dl-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const idx = parseInt(this.getAttribute('data-index'));
+            showQualityPicker(lbSongs[idx]);
         });
     });
 
@@ -3441,23 +3472,50 @@ window.backToHotSearch = backToHotSearch;
 
 let isDownloading = false;
 
-async function downloadCurrentSong() {
-    if (isDownloading) { showSnackbar('正在下载中，请稍候...', 'warning'); return; }
+let pendingDownloadSong = null;
 
-    const song = getActiveSong();
-    if (!song) { showSnackbar('没有正在播放的歌曲', 'warning'); return; }
+function showQualityPicker(song) {
+    if (isDownloading) { showSnackbar('正在下载中，请稍候...', 'warning'); return; }
+    pendingDownloadSong = song;
+
+    const name = song.name || '未知歌曲';
+    const singer = song.singer || '';
+    const content = singer ? `${name} - ${singer}` : name;
+    document.getElementById('qualityPickerContent').textContent = content;
+
+    const overlay = document.getElementById('qualityPickerOverlay');
+    overlay.style.display = 'flex';
+
+    // 绑定音质选项点击事件
+    const options = document.querySelectorAll('#qualityPickerOptions .quality-option');
+    options.forEach(opt => {
+        opt.onclick = function() {
+            const quality = this.getAttribute('data-quality');
+            const song = pendingDownloadSong;
+            closeQualityPicker();
+            downloadSong(song, quality);
+        };
+    });
+}
+
+function closeQualityPicker(event) {
+    if (event && event.target !== document.getElementById('qualityPickerOverlay')) return;
+    document.getElementById('qualityPickerOverlay').style.display = 'none';
+    pendingDownloadSong = null;
+}
+
+async function downloadSong(song, quality) {
+    if (isDownloading) { showSnackbar('正在下载中，请稍候...', 'warning'); return; }
 
     const name = song.name || '';
     const singer = song.singer || '';
     const album = song.album || '';
     const source = song.source || '';
-    const quality = getBestQuality(song);
-
-    const downloadBtn = document.getElementById('playerDownloadBtn');
-    const fpDownloadBtn = document.getElementById('fpDownloadBtn');
 
     const setDownloadingState = (dl) => {
         isDownloading = dl;
+        const downloadBtn = document.getElementById('playerDownloadBtn');
+        const fpDownloadBtn = document.getElementById('fpDownloadBtn');
         if (downloadBtn) {
             downloadBtn.classList.toggle('downloading', dl);
             const span = downloadBtn.querySelector('.material-symbols-outlined');
@@ -3471,30 +3529,26 @@ async function downloadCurrentSong() {
     };
 
     const setDoneState = () => {
-        if (downloadBtn) {
-            downloadBtn.classList.remove('downloading');
-            downloadBtn.classList.add('download-done');
-            const span = downloadBtn.querySelector('.material-symbols-outlined');
+        isDownloading = false;
+        const downloadBtn = document.getElementById('playerDownloadBtn');
+        const fpDownloadBtn = document.getElementById('fpDownloadBtn');
+        const applyDone = (btn) => {
+            if (!btn) return;
+            btn.classList.remove('downloading');
+            btn.classList.add('download-done');
+            const span = btn.querySelector('.material-symbols-outlined');
             if (span) span.textContent = 'download_done';
             setTimeout(() => {
-                downloadBtn.classList.remove('download-done');
+                btn.classList.remove('download-done');
                 if (span) span.textContent = 'download_for_offline';
             }, 2500);
-        }
-        if (fpDownloadBtn) {
-            fpDownloadBtn.classList.remove('downloading');
-            fpDownloadBtn.classList.add('download-done');
-            const span = fpDownloadBtn.querySelector('.material-symbols-outlined');
-            if (span) span.textContent = 'download_done';
-            setTimeout(() => {
-                fpDownloadBtn.classList.remove('download-done');
-                if (span) span.textContent = 'download_for_offline';
-            }, 2500);
-        }
+        };
+        applyDone(downloadBtn);
+        applyDone(fpDownloadBtn);
     };
 
     setDownloadingState(true);
-    showSnackbar('正在下载: ' + name + '...', 'info');
+    showSnackbar(`正在下载 [${quality}]: ${name}...`, 'info');
 
     try {
         const body = {
@@ -3514,7 +3568,7 @@ async function downloadCurrentSong() {
 
         if (resp.code === 0) {
             setDoneState();
-            showSnackbar('下载成功: ' + name + ' (已嵌入元数据)', 'success');
+            showSnackbar(`下载成功 [${quality}]: ${name}`, 'success');
         } else {
             setDownloadingState(false);
             showSnackbar('下载失败: ' + (resp.message || '未知错误'), 'error');
@@ -3524,6 +3578,12 @@ async function downloadCurrentSong() {
         console.error('下载歌曲失败:', e);
         showSnackbar('下载失败: ' + (e.message || '网络错误'), 'error');
     }
+}
+
+function downloadCurrentSong() {
+    const song = getActiveSong();
+    if (!song) { showSnackbar('没有正在播放的歌曲', 'warning'); return; }
+    showQualityPicker(song);
 }
 
 // Player v2.5.0 new functions

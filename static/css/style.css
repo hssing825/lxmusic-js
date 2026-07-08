@@ -610,6 +610,80 @@ select option {
     padding: 8px 16px 16px;
 }
 
+/* ─── Quality Picker ─── */
+.quality-picker-dialog {
+    max-width: 320px;
+}
+
+.quality-picker-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 24px 16px;
+}
+
+.quality-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--md-on-surface);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.quality-option:hover {
+    background: var(--md-primary-container);
+    border-color: var(--md-primary);
+    color: var(--md-primary);
+}
+
+.quality-option:active {
+    transform: scale(0.97);
+}
+
+/* ─── Song list download button ─── */
+.result-item .dl-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--md-on-surface-variant);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 1;
+    transition: all .25s var(--spring);
+}
+
+.result-item .dl-btn:hover {
+    background: var(--md-primary-container);
+    color: var(--md-primary);
+    transform: scale(1.1);
+}
+
+.result-item .dl-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.result-item .dl-btn.downloading {
+    color: var(--md-primary);
+    pointer-events: none;
+}
+
+.result-item .dl-btn.download-done {
+    color: var(--md-success);
+}
+
 /* ─── List Items ─── */
 .list-item {
     display: flex;
@@ -666,7 +740,7 @@ select option {
 .col-artist { flex: 1; min-width: 0; font-size: 13px; color: var(--md-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .col-album { flex: 1; min-width: 0; font-size: 13px; color: var(--md-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .col-duration { width: 56px; flex-shrink: 0; font-size: 12px; color: var(--md-on-surface-variant); text-align: center; }
-.col-actions { width: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.col-actions { width: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
 .result-thumb {
     width: 38px; height: 38px;
