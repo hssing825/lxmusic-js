@@ -96,7 +96,7 @@ async function onInit(): Promise<void> {
   registerSonglistHandlers(router, registry);
   registerLeaderboardHandlers(router, registry);
   registerSettingsHandlers(router);
-  registerDownloadHandlers(router, runtimeManager);
+  registerDownloadHandlers(router, runtimeManager, registry);
 
   // 7. 异步加载已启用的音源
   const enabledSources = sourceManager.getEnabledSources();

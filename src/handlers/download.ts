@@ -2,6 +2,7 @@
 
 import type { Router, HTTPRequest } from '@songloft/plugin-sdk';
 import type { RuntimeManager } from '../engine/manager';
+import type { Registry } from '@songloft/musicsdk/dist/index.js';
 import { successResponse, errorResponse } from './response';
 
 /** 解析请求体 */
@@ -20,6 +21,7 @@ function parseBody(req: HTTPRequest): any {
 export function registerDownloadHandlers(
   router: Router,
   runtimeManager: RuntimeManager,
+  registry: Registry,
 ): void {
 
   // POST /api/direct/download — 下载歌曲（含元数据嵌入）
@@ -63,13 +65,30 @@ export function registerDownloadHandlers(
         return errorResponse(500, '无法获取歌曲播放链接，请检查音源配置');
       }
 
-      // 3. 构建 dedupKey
+      // 3. 获取歌词
+      let lyric: string | undefined;
+      const fetcher = registry.getLyricFetcher(source);
+      if (fetcher) {
+        try {
+          songloft.log.info(`[download] 正在获取歌词: ${name} - ${singer}`);
+          const lyricResult = await fetcher.getLyric(songInfo);
+          if (lyricResult?.lyric?.trim()) {
+            lyric = lyricResult.lyric;
+            songloft.log.info(`[download] 歌词获取成功: ${name} (${lyric.length} 字符)`);
+          }
+        } catch (e) {
+          songloft.log.warn(`[download] 获取歌词失败: ${name}, error=${e.message || String(e)}`);
+          // 获取歌词失败不影响下载继续
+        }
+      }
+
+      // 4. 构建 dedupKey
       const idForDedup = musicId || songmid || hash || '';
       const dedupKey = idForDedup ? `${source}:${idForDedup}` : '';
 
-      // 4. 创建歌曲到数据库
+      // 5. 创建歌曲到数据库（歌词会在下载时嵌入元数据）
       songloft.log.info(`[download] 正在创建歌曲记录: ${name}`);
-      const createResult = await songloft.songs.create([{
+      const createInput: any = {
         url,
         title: name,
         artist: singer,
@@ -77,7 +96,12 @@ export function registerDownloadHandlers(
         coverUrl: img || undefined,
         duration: duration || undefined,
         dedupKey: dedupKey || undefined,
-      }]);
+      };
+      if (lyric) {
+        createInput.lyric = lyric;
+      }
+
+      const createResult = await songloft.songs.create([createInput]);
 
       if (!createResult || createResult.length === 0) {
         return errorResponse(500, '创建歌曲记录失败');
@@ -86,9 +110,10 @@ export function registerDownloadHandlers(
       const songId = createResult[0].id;
       songloft.log.info(`[download] 歌曲已创建: id=${songId}, 开始下载...`);
 
-      // 5. 下载歌曲（嵌入元数据）
+      // 6. 下载歌曲（嵌入元数据包括歌词，使用 歌曲名-歌手名 格式）
       const downloadResult = await songloft.songs.download(songId, {
         embed_metadata: true,
+        path_template: 'lxdownload/{title} - {artist}',
       });
 
       songloft.log.info(`[download] 下载完成: id=${songId}, path=${downloadResult.path}, status=${downloadResult.status}`);
